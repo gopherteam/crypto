@@ -136,10 +136,10 @@ func (d *digest) MarshalBinary() ([]byte, error) {
 	b := make([]byte, 0, marshaledSize)
 	b = append(b, magic...)
 	for i := 0; i < 8; i++ {
-		b = appendUint32(b, d.h[i])
+		b = binary.BigEndian.AppendUint32(b, d.h[i])
 	}
-	b = appendUint32(b, d.c[0])
-	b = appendUint32(b, d.c[1])
+	b = binary.BigEndian.AppendUint32(b, d.c[0])
+	b = binary.BigEndian.AppendUint32(b, d.c[1])
 	// Maximum value for size is 32
 	b = append(b, byte(d.size))
 	b = append(b, d.block[:]...)
@@ -232,12 +232,6 @@ func (d *digest) finalize(hash *[Size]byte) {
 	for i, v := range h {
 		binary.LittleEndian.PutUint32(hash[4*i:], v)
 	}
-}
-
-func appendUint32(b []byte, x uint32) []byte {
-	var a [4]byte
-	binary.BigEndian.PutUint32(a[:], x)
-	return append(b, a[:]...)
 }
 
 func consumeUint32(b []byte) ([]byte, uint32) {
